@@ -12,6 +12,7 @@ import pandas as pd
 import datetime
 from matplotlib import pyplot as plt
 from mpl_toolkits.basemap import Basemap
+from collections import Counter
 
 #read data from folder, could be taken from database or any other method as well
 os.chdir(r'C:\\Users\gvega\OneDrive\Documentos\Code\Intelimetrica_exam\The_X-Files_Problem\ufo_sightings')
@@ -81,8 +82,69 @@ should the guy go, I will cluster some lats,longs and build an histogram
 """
 #To cluster I will do it by degree of longitude/latitude
 # -40.2,80 will be clustered with -40.8, 80.7
-#this is because one degree = 69 miles (approx)
+#this is because one degree = 69 miles (approx) and its not practical to travel more than that
+#I will consider every sighting to have the same importance
+latArray = []
+longArray = []
+mergedArray = []
+exceptionIndexArray = []
+for i in range(len(ufo_sightings)): #basically build an array for latitude, for longitude and both
+    try:
+        latArray.append(int(float(ufo_sightings.iloc[i]['latitude'])))
+        longArray.append(int(float(ufo_sightings.iloc[i]['longitude'])))
+        mergedArray.append((str(int(float(ufo_sightings.iloc[i]['longitude']))) + " " + str(int(float(ufo_sightings.iloc[i]['latitude'])))))
+    except:
+        exceptionIndexArray.append(i)
+        #literally one number had a 'b' in the longitude, i just ignored it
+        #probably thats why I get an error when building the maps.
+        #might delete later
+    
 
+"""
+if you wanted to build an histogram of the latitude and longitude separately 
+you use this, but its the combination what matters
+latLongPandas = pd.DataFrame()
+latLongPandas['Longitude'] = latArray
+latLongPandas['Latitude'] = longArray
+latLongPandas['Longitude'].plot.hist()
+latLongPandas['Latitude'].plot.hist()
+"""
+mergedStringCounts = Counter(mergedArray) #counting every instance of a sighting in a zone
+filteredMergedCounts = {} #remove values under certain frequency, in this case under 1000
+for value in mergedStringCounts:
+    if(mergedStringCounts[value] > 1000):
+        filteredMergedCounts[value] = mergedStringCounts[value]
+        
+#instead of the coordinate write the name of the place        
+namedCountsForHistogram = {}
+namedCountsForHistogram['Fairfax Forest Reserve'] = filteredMergedCounts['-122 47'] 
+namedCountsForHistogram['Hillgrove'] = filteredMergedCounts['-118 34'] 
+namedCountsForHistogram['Toms River'] = filteredMergedCounts['-74 40'] 
+namedCountsForHistogram['Poway'] = filteredMergedCounts['-117 33'] 
+
+latLongMergedPandas = pd.DataFrame.from_dict(namedCountsForHistogram, orient='index')
+
+latLongMergedPandas.plot(kind='bar')
+
+#Hillgrove and Poway are very close to each other, so I will build a map with
+    #the data to see if there is any cluster
+filteredMergedCountsForMap = {} #remove values under certain frequency, in this case under 500
+for value in mergedStringCounts:
+    if(mergedStringCounts[value] > 800):
+        filteredMergedCountsForMap[value] = mergedStringCounts[value]
+
+latArray = [] #I am repeating this variables, I could transform them into methods and we avoid any trouble
+longArray = []
+
+for value in filteredMergedCountsForMap: #Building the array in a format understandable for mapping
+    longArray.append(value[:value.find(" ")])
+    latArray.append(value[value.find(" ")+1:])
+
+filteredMergedCountsForMapPandas = pd.DataFrame()
+filteredMergedCountsForMapPandas['longitude'] = longArray
+filteredMergedCountsForMapPandas['latitude'] = latArray
+
+buildMapFromPandasDatabase(filteredMergedCountsForMapPandas)
 
 
 """
@@ -101,4 +163,16 @@ build a histogram with country frequency (and maybe state)
 note: sightings might have a time shift with distribution, I have to see if 
 evey ¿decade? is there a shift in position of sightings
 
+"""
+
+"""
+pending box:
+    
+exceptionIndexArray.append(i)
+#literally one number had a 'b' in the longitude, i just ignored it
+#probably thats why I get an error when building the maps.
+#might delete later
+        
+latArray = [] #I am repeating this variables, I could transform them into methods and we avoid any trouble
+longArray = []
 """
