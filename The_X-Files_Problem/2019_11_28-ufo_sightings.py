@@ -13,7 +13,7 @@ import datetime
 from matplotlib import pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from collections import Counter
-
+import random 
 #read data from folder, could be taken from database or any other method as well
 os.chdir(r'C:\\Users\gvega\OneDrive\Documentos\Code\Intelimetrica_exam\The_X-Files_Problem\ufo_sightings')
 ufo_sightings  = pd.read_csv('UFO_sightings.csv')
@@ -43,7 +43,20 @@ def checkLatLongTimeIntegrity(dataset):
     return returnArray
 
 
-
+def buildMapFromPandasDatabaseWithText(database):
+    fig = plt.figure(figsize=(18, 16), edgecolor='w')
+    m = Basemap(projection='moll', resolution=None,
+                lat_0=0, lon_0=0)
+    m.etopo()
+    # Map (long, lat) to (x, y) for plotting
+    randomRangeStart = random.randint(0, len(database) - 101)
+    randomRangeEnd= randomRangeStart + 100
+    for i in range(randomRangeStart, randomRangeEnd):    
+        x, y = m(database.iloc[i]['longitude'], database.iloc[i]['latitude'])
+        plt.plot(x, y, 'ok', markersize=3)
+        plt.text(x, y,database.iloc[i]['country'] , fontsize=8);
+        
+        
 #Hypotesis #1, the sightings are clustered in specific areas:
 def buildMapFromPandasDatabase(database):
     fig = plt.figure(figsize=(18, 16), edgecolor='w')
