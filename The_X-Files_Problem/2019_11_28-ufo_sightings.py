@@ -146,6 +146,9 @@ filteredMergedCountsForMapPandas['latitude'] = latArray
 
 buildMapFromPandasDatabase(filteredMergedCountsForMapPandas)
 
+#I can safely reccomend that Mr.TinFoil should go to Calidornia,
+#specifically San Diego, California, -117.5, 33.5
+
 
 """
 to save and continue working later
