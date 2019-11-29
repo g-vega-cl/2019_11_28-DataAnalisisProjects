@@ -20,15 +20,15 @@ ufo_sightings  = pd.read_csv('UFO_sightings.csv')
 
 
 #Hypotesis #1, the sightings are clustered in specific areas:
-fig = plt.figure(figsize=(18, 16), edgecolor='w')
-m = Basemap(projection='moll', resolution=None,
-            lat_0=0, lon_0=0)
-m.etopo()
-# Map (long, lat) to (x, y) for plotting
-for i in range(len(ufo_sightings)):    
-    x, y = m(ufo_sightings.iloc[i]['longitude'], ufo_sightings.iloc[i]['latitude'])
-    plt.plot(x, y, 'ok', markersize=5)
-    latlong = ufo_sightings.iloc[i]['latitude'], ufo_sightings.iloc[i]['longitude']
+def buildMapFromPandasDatabase(database):
+    fig = plt.figure(figsize=(18, 16), edgecolor='w')
+    m = Basemap(projection='moll', resolution=None,
+                lat_0=0, lon_0=0)
+    m.etopo()
+    # Map (long, lat) to (x, y) for plotting
+    for i in range(len(database)):    
+        x, y = m(database.iloc[i]['longitude'], database.iloc[i]['latitude'])
+        plt.plot(x, y, 'ok', markersize=3)
 #clearly most sightings are in north america (The US Specifically) and Europe
 
 #Scince the question is basically all about location i will ignore comments, and shape
@@ -67,6 +67,23 @@ for i in range(len(ufo_sightings)):
         print(i/len(ufo_sightings))
 #Could I have done a sort() and just find the indices where the condition is met?
     #would that be faster?        - thing is, to sort you need to convert to date anyways
+"""
+building the maps according to time
+buildMapFromPandasDatabase(DF1940to1960)
+buildMapFromPandasDatabase(DF1960to1980)
+buildMapFromPandasDatabase(DF1980to2000)
+buildMapFromPandasDatabase(DF2000to2020)
+
+basically the more time passes the more sightings there are
+but the US is still the main place.
+this will be useful to present, but to answer the question of where
+should the guy go, I will cluster some lats,longs and build an histogram
+"""
+#To cluster I will do it by degree of longitude/latitude
+# -40.2,80 will be clustered with -40.8, 80.7
+#this is because one degree = 69 miles (approx)
+
+
 
 """
 to save and continue working later
