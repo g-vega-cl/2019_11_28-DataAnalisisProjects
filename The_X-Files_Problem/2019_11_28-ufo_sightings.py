@@ -18,6 +18,30 @@ from collections import Counter
 os.chdir(r'C:\\Users\gvega\OneDrive\Documentos\Code\Intelimetrica_exam\The_X-Files_Problem\ufo_sightings')
 ufo_sightings  = pd.read_csv('UFO_sightings.csv')
 
+#Check latitude, longitude and time(seconds) data integrity
+    #To do this we will just pass to float and see if they have any symbols that sould not be there.
+
+def checkLatLongTimeIntegrity(dataset):
+    latArray = []
+    longArray = []
+    secondsArray = []
+    for i in range(len(dataset)):
+        try:
+            longArray.append(float(dataset.iloc[i]['longitude']))
+        except:
+            print("error in long array in index: " + str(i))
+        try:
+            latArray.append(float(dataset.iloc[i]['latitude']))
+        except:
+            print("error in lat array in index: " + str(i))
+        try:
+            secondsArray.append(float(dataset.iloc[i]['duration (seconds)']))
+        except:
+            print("error in seconds array in index: " + str(i))
+
+    returnArray = [latArray, longArray, secondsArray]
+    return returnArray
+
 
 
 #Hypotesis #1, the sightings are clustered in specific areas:
