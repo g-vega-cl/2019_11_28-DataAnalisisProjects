@@ -38,11 +38,13 @@ def checkLatLongTimeIntegrity(dataset):
             secondsArray.append(float(dataset.iloc[i]['duration (seconds)']))
         except:
             print("error in seconds array in index: " + str(i))
-
+        
+        if(i % 1000 == 0):
+            print(i / len(dataset))
     returnArray = [latArray, longArray, secondsArray]
     return returnArray
 
-
+#Check consistency of country labels and coordinates
 def buildMapFromPandasDatabaseWithText(database):
     fig = plt.figure(figsize=(18, 16), edgecolor='w')
     m = Basemap(projection='moll', resolution=None,
@@ -149,6 +151,40 @@ def clusterDataByLatLong(ufo_sightings):
     latLongPandas['Longitude'].plot.hist()
     latLongPandas['Latitude'].plot.hist()
     """
+def buildHistogramFromArray(array):
+    arrayCounted = Counter(array)
+    pandasCountedArray = pd.DataFrame.from_dict(arrayCounted, orient = 'index')
+    pandasCountedArray.plot(kind='bar')
+
+#filtering results of a box and outside the box, this is to see if there is a difference between 
+    #duration in and outside US, plus its nice to know the percentage of sightings in the US.
+def filterResultsByGeographicalBox(bottomLeftLat,bottomLeftLong,topRightLat,topRightLong,array):
+    sightingsInBox = pd.DataFrame()
+    restOfWorldSightings = pd.DataFrame()
+    for i in range(int(len(array))):
+        try:
+            if int(float(array.iloc[i]['latitude'])) > bottomLeftLat and int(float(array.iloc[i]['longitude'])) > bottomLeftLong:
+                if int(float(array.iloc[i]['latitude'])) < topRightLat and int(float(array.iloc[i]['longitude'])) < topRightLong:
+                    sightingsInBox = sightingsInBox.append(array.iloc[i])
+                else:
+                    restOfWorldSightings = restOfWorldSightings.append(array.iloc[i])
+            else:
+                restOfWorldSightings = restOfWorldSightings.append(array.iloc[i])
+        except:
+            print("there was an exception")
+            pass
+        if i% 1000 == 0:
+            print(i/(len(array)))
+                
+    sightingsArray = [sightingsInBox,restOfWorldSightings]
+    return sightingsArray
+
+US_Sightings, restOfWorldSightings = filterResultsByGeographicalBox(32,-120,50,-66,ufo_sightings)
+
+def saveArrayToCsv(array, name):
+    arrayPandas = pd.DataFrame(array)
+    arrayPandas.to_csv(name)
+
 def buildingDictionariesAndBuildHistogramOfLocations(mergedArray):
     mergedStringCounts = Counter(mergedArray) #counting every instance of a sighting in a zone
     filteredMergedCounts = {} #remove values under certain frequency, in this case under 1000
