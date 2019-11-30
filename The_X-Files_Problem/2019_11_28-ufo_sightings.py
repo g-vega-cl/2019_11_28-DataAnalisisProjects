@@ -19,9 +19,38 @@ import matplotlib
 os.chdir(r'C:\\Users\gvega\OneDrive\Documentos\Code\Intelimetrica_exam\The_X-Files_Problem\ufo_sightings')
 ufo_sightings  = pd.read_csv('UFO_sightings.csv')
 
+"""
+This are helper fucntions to get some specific parts of data or change data types
+"""
+def buildArrayFromPandasDatabase(dataset,sectionIndexName): #Helper funciton to transform pandas into array
+    array = []
+    for i in range(len(dataset)):
+        try:
+            array.append(float(dataset.iloc[i][sectionIndexName]))
+        except:
+            print("error in array in index: " + str(i))
+        
+        if(i % 1000 == 0):
+            print(i / len(dataset))
+    
+    return array
+
+    
+def saveArrayToCsv(array, name):
+    arrayPandas = pd.DataFrame(array)
+    arrayPandas.to_csv(name)
+
+def buildHistogramFromArray(array):
+    arrayCounted = Counter(array)
+    pandasCountedArray = pd.DataFrame.from_dict(arrayCounted, orient = 'index')
+    pandasCountedArray.plot(kind='bar')
+"""
+End of helper functions
+"""
+
 #Check latitude, longitude and time(seconds) data integrity
     #To do this we will just pass to float and see if they have any symbols that sould not be there.
-def checkLatLongTimeIntegrity(dataset):
+def checkLatLongTimeIntegrity(dataset): #Report page 3
     latArray = []
     longArray = []
     secondsArray = []
@@ -44,22 +73,10 @@ def checkLatLongTimeIntegrity(dataset):
     returnArray = [latArray, longArray, secondsArray]
     return returnArray
 
-def buildArrayFromPandasDatabase(dataset,sectionIndexName):
-    array = []
-    for i in range(len(dataset)):
-        try:
-            array.append(float(dataset.iloc[i][sectionIndexName]))
-        except:
-            print("error in array in index: " + str(i))
-        
-        if(i % 1000 == 0):
-            print(i / len(dataset))
-    
-    return array
     
 
 #Check consistency of country labels and coordinates
-def buildMapFromPandasDatabaseWithText(database):
+def buildMapFromPandasDatabaseWithText(database): #report page 5
     fig = plt.figure(figsize=(18, 16), edgecolor='w')
     m = Basemap(projection='moll', resolution=None,
                 lat_0=0, lon_0=0)
@@ -74,7 +91,9 @@ def buildMapFromPandasDatabaseWithText(database):
         
         
 #Hypotesis #1, the sightings are clustered in specific areas:
-def buildMapFromPandasDatabase(database):
+
+#This is used in other functions to draw the map
+def buildMapFromPandasDatabase(database): 
     fig = plt.figure(figsize=(18, 16), edgecolor='w')
     m = Basemap(projection='moll', resolution=None,
                 lat_0=0, lon_0=0)
@@ -84,13 +103,13 @@ def buildMapFromPandasDatabase(database):
         x, y = m(database.iloc[i]['longitude'], database.iloc[i]['latitude'])
         plt.plot(x, y, 'ok', markersize=3)
 #clearly most sightings are in north america (The US Specifically) and Europe
-
+        
 #Scince the question is basically all about location i will ignore comments, and shape
 
     
 #I will start checking if there is a difference with distribution with time
 #Will hardcode this things to make it faster. Check in the future how to do a df inside another one
-def buildDatabasesByTimeAndPlotMapsPerTimePeriod(ufo_sightings):
+def buildDatabasesByTimeAndPlotMapsPerTimePeriod(ufo_sightings): #report page 6
     DF1940to1960 = pd.DataFrame()
     DF1960to1980 = pd.DataFrame()
     DF1980to2000 = pd.DataFrame()
@@ -120,29 +139,31 @@ def buildDatabasesByTimeAndPlotMapsPerTimePeriod(ufo_sightings):
             
         if(i % int(len(ufo_sightings)/500)):
             print(i/len(ufo_sightings))
-    #Could I have done a sort() and just find the indices where the condition is met?
-        #would that be faster?        - thing is, to sort you need to convert to date anyways
-    """
-    building the maps according to time
-    buildMapFromPandasDatabase(DF1940to1960)
-    buildMapFromPandasDatabase(DF1960to1980)
-    buildMapFromPandasDatabase(DF1980to2000)
-    buildMapFromPandasDatabase(DF2000to2020)
+            
+#filtering results of a box and outside the box, this is to see if there is a difference between 
+    #duration in and outside US, plus its nice to know the percentage of sightings in the US.
+def filterResultsByGeographicalBox(bottomLeftLat,bottomLeftLong,topRightLat,topRightLong,array): #report page 7
+    sightingsInBox = pd.DataFrame()
+    restOfWorldSightings = pd.DataFrame()
+    for i in range(int(len(array))):
+        try:
+            if int(float(array.iloc[i]['latitude'])) > bottomLeftLat and int(float(array.iloc[i]['longitude'])) > bottomLeftLong:
+                if int(float(array.iloc[i]['latitude'])) < topRightLat and int(float(array.iloc[i]['longitude'])) < topRightLong:
+                    sightingsInBox = sightingsInBox.append(array.iloc[i])
+                else:
+                    restOfWorldSightings = restOfWorldSightings.append(array.iloc[i])
+            else:
+                restOfWorldSightings = restOfWorldSightings.append(array.iloc[i])
+        except:
+            print("there was an exception")
+            pass
+        if i% 1000 == 0:
+            print(i/(len(array)))
+                
+    sightingsArray = [sightingsInBox,restOfWorldSightings]
+    return sightingsArray            
     
-    basically the more time passes the more sightings there are
-    but the US is still the main place.
-    this will be useful to present, but to answer the question of where
-    should the guy go, I will cluster some lats,longs and build an histogram
-    """
-"""
-load csvs
-DF2000to2020  = pd.read_csv('DF2000to2020.csv')
-DF1980to2000  = pd.read_csv('DF1980to2000.csv')
-DF1960to1980  = pd.read_csv('DF1960to1980.csv')
-DF1940to1960  = pd.read_csv('DF1940to1960.csv')
-"""
-    
-def clusterDataByLatLong(ufo_sightings):
+def clusterDataByLatLong(ufo_sightings): 
     #To cluster I will do it by degree of longitude/latitude
     # -40.2,80 will be clustered with -40.8, 80.7
     #this is because one degree = 69 miles (approx) and its not practical to travel more than that
@@ -164,67 +185,17 @@ def clusterDataByLatLong(ufo_sightings):
         if(i % int(len(ufo_sightings)/100)):
             print(i/len(ufo_sightings))
     return mergedArray
-        
-    
-    """
-    if you wanted to build an histogram of the latitude and longitude separately 
-    you use this, but its the combination what matters
-    latLongPandas = pd.DataFrame()
-    latLongPandas['Longitude'] = latArray
-    latLongPandas['Latitude'] = longArray
-    latLongPandas['Longitude'].plot.hist()
-    latLongPandas['Latitude'].plot.hist()
-    """
-def buildHistogramFromArray(array):
-    arrayCounted = Counter(array)
-    pandasCountedArray = pd.DataFrame.from_dict(arrayCounted, orient = 'index')
-    pandasCountedArray.plot(kind='bar')
-
-#filtering results of a box and outside the box, this is to see if there is a difference between 
-    #duration in and outside US, plus its nice to know the percentage of sightings in the US.
-def filterResultsByGeographicalBox(bottomLeftLat,bottomLeftLong,topRightLat,topRightLong,array):
-    sightingsInBox = pd.DataFrame()
-    restOfWorldSightings = pd.DataFrame()
-    for i in range(int(len(array))):
-        try:
-            if int(float(array.iloc[i]['latitude'])) > bottomLeftLat and int(float(array.iloc[i]['longitude'])) > bottomLeftLong:
-                if int(float(array.iloc[i]['latitude'])) < topRightLat and int(float(array.iloc[i]['longitude'])) < topRightLong:
-                    sightingsInBox = sightingsInBox.append(array.iloc[i])
-                else:
-                    restOfWorldSightings = restOfWorldSightings.append(array.iloc[i])
-            else:
-                restOfWorldSightings = restOfWorldSightings.append(array.iloc[i])
-        except:
-            print("there was an exception")
-            pass
-        if i% 1000 == 0:
-            print(i/(len(array)))
-                
-    sightingsArray = [sightingsInBox,restOfWorldSightings]
-    return sightingsArray
-
-#US_Sightings, restOfWorldSightings = filterResultsByGeographicalBox(32,-120,50,-66,ufo_sightings)
-"""
-load csvs
-US_Sightings  = pd.read_csv('US_Sightings.csv')
-restOfWorldSightings = pd.read_csv('WorldSightingsNoUS.csv')
-
-matplotlib.pyplot.boxplot(restOfWorldSeconds)
-"""
 
 
-def saveArrayToCsv(array, name):
-    arrayPandas = pd.DataFrame(array)
-    arrayPandas.to_csv(name)
-
-def buildingDictionariesAndBuildHistogramOfLocations(mergedArray):
+#This function has geographical data hardcoded, care when reusing
+def buildingDictionariesAndBuildHistogramOfLocations(mergedArray): #report page 8,9
     mergedStringCounts = Counter(mergedArray) #counting every instance of a sighting in a zone
     filteredMergedCounts = {} #remove values under certain frequency, in this case under 1000
     for value in mergedStringCounts:
         if(mergedStringCounts[value] > 1000):
             filteredMergedCounts[value] = mergedStringCounts[value]
             
-    #instead of the coordinate write the name of the place        
+    #instead of the coordinate write the name of the place, this is not a reusable function      
     namedCountsForHistogram = {}
     namedCountsForHistogram['Fairfax Forest Reserve'] = filteredMergedCounts['-122 47'] 
     namedCountsForHistogram['Hillgrove'] = filteredMergedCounts['-118 34'] 
@@ -237,12 +208,12 @@ def buildingDictionariesAndBuildHistogramOfLocations(mergedArray):
 
     #Hillgrove and Poway are very close to each other, so I will build a map with
         #the data to see if there is any cluster
-    filteredMergedCountsForMap = {} #remove values under certain frequency, in this case under 500
+    filteredMergedCountsForMap = {} #remove values under certain frequency, in this case under 800
     for value in mergedStringCounts:
         if(mergedStringCounts[value] > 800):
             filteredMergedCountsForMap[value] = mergedStringCounts[value]
     
-    latArray = [] #I am repeating this variables, I could transform them into methods and we avoid any trouble
+    latArray = []
     longArray = []
     
     for value in filteredMergedCountsForMap: #Building the array in a format understandable for mapping
@@ -257,35 +228,8 @@ def buildingDictionariesAndBuildHistogramOfLocations(mergedArray):
 
 #I can safely reccomend that Mr.TinFoil should go to Calidornia,
 #specifically San Diego, California, -117.5, 33.5
-
-
-"""
-to save and continue working later
-DF1940to1960.to_csv("DF1940to1960.csv")
-DF1960to1980.to_csv("DF1960to1980.csv")
-DF1980to2000.to_csv("DF1980to2000.csv")
-DF2000to2020.to_csv("DF2000to2020.csv")
-
-matplotlib.pyplot.boxplot(array1980to2000)
-matplotlib.pyplot.boxplot(array1960to1980)
-matplotlib.pyplot.boxplot(array1940to1960)
-"""
-"""
-#IDEA BOX
-
-build a histogram with country frequency (and maybe state)
-    building on that idea we could clusters lat/longs and build an histogram for those too -DONE
-
-note: sightings might have a time shift with distribution, I have to see if 
-evey ¿decade? is there a shift in position of sightings - DONE
-
-"""
-
-"""
-pending box:
     
-exceptionIndexArray.append(i)
-#literally one number had a 'b' in the longitude, i just ignored it
-#probably thats why I get an error when building the maps.
-#might delete later
-"""
+    
+
+    
+    
