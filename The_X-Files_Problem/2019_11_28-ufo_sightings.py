@@ -44,6 +44,20 @@ def buildHistogramFromArray(array):
     arrayCounted = Counter(array)
     pandasCountedArray = pd.DataFrame.from_dict(arrayCounted, orient = 'index')
     pandasCountedArray.plot(kind='bar')
+    
+
+#This is used in other functions to draw the map
+def buildMapFromPandasDatabase(database): 
+    fig = plt.figure(figsize=(18, 16), edgecolor='w')
+    m = Basemap(projection='moll', resolution=None,
+                lat_0=0, lon_0=0)
+    m.etopo()
+    # Map (long, lat) to (x, y) for plotting
+    for i in range(len(database)):    
+        x, y = m(database.iloc[i]['longitude'], database.iloc[i]['latitude'])
+        plt.plot(x, y, 'ok', markersize=3)    
+        
+#matplotlib.pyplot.boxplot(data)   build a boxplot
 """
 End of helper functions
 """
@@ -88,24 +102,6 @@ def buildMapFromPandasDatabaseWithText(database): #report page 4
         x, y = m(database.iloc[i]['longitude'], database.iloc[i]['latitude'])
         plt.plot(x, y, 'ok', markersize=3)
         plt.text(x, y,database.iloc[i]['country'] , fontsize=8);
-        
-        
-#Hypotesis #1, the sightings are clustered in specific areas:
-
-#This is used in other functions to draw the map
-def buildMapFromPandasDatabase(database): 
-    fig = plt.figure(figsize=(18, 16), edgecolor='w')
-    m = Basemap(projection='moll', resolution=None,
-                lat_0=0, lon_0=0)
-    m.etopo()
-    # Map (long, lat) to (x, y) for plotting
-    for i in range(len(database)):    
-        x, y = m(database.iloc[i]['longitude'], database.iloc[i]['latitude'])
-        plt.plot(x, y, 'ok', markersize=3)
-#clearly most sightings are in north america (The US Specifically) and Europe
-        
-#Scince the question is basically all about location i will ignore comments, and shape
-
     
 #I will start checking if there is a difference with distribution with time
 #Will hardcode this things to make it faster. Check in the future how to do a df inside another one
