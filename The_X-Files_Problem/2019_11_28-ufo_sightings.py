@@ -14,13 +14,13 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.basemap import Basemap
 from collections import Counter
 import random 
+import matplotlib
 #read data from folder, could be taken from database or any other method as well
 os.chdir(r'C:\\Users\gvega\OneDrive\Documentos\Code\Intelimetrica_exam\The_X-Files_Problem\ufo_sightings')
 ufo_sightings  = pd.read_csv('UFO_sightings.csv')
 
 #Check latitude, longitude and time(seconds) data integrity
     #To do this we will just pass to float and see if they have any symbols that sould not be there.
-
 def checkLatLongTimeIntegrity(dataset):
     latArray = []
     longArray = []
@@ -43,6 +43,20 @@ def checkLatLongTimeIntegrity(dataset):
             print(i / len(dataset))
     returnArray = [latArray, longArray, secondsArray]
     return returnArray
+
+def buildArrayFromPandasDatabase(dataset,sectionIndexName):
+    array = []
+    for i in range(len(dataset)):
+        try:
+            array.append(float(dataset.iloc[i][sectionIndexName]))
+        except:
+            print("error in array in index: " + str(i))
+        
+        if(i % 1000 == 0):
+            print(i / len(dataset))
+    
+    return array
+    
 
 #Check consistency of country labels and coordinates
 def buildMapFromPandasDatabaseWithText(database):
@@ -72,7 +86,7 @@ def buildMapFromPandasDatabase(database):
 #clearly most sightings are in north america (The US Specifically) and Europe
 
 #Scince the question is basically all about location i will ignore comments, and shape
-    
+
     
 #I will start checking if there is a difference with distribution with time
 #Will hardcode this things to make it faster. Check in the future how to do a df inside another one
@@ -120,6 +134,13 @@ def buildDatabasesByTimeAndPlotMapsPerTimePeriod(ufo_sightings):
     this will be useful to present, but to answer the question of where
     should the guy go, I will cluster some lats,longs and build an histogram
     """
+"""
+load csvs
+DF2000to2020  = pd.read_csv('DF2000to2020.csv')
+DF1980to2000  = pd.read_csv('DF1980to2000.csv')
+DF1960to1980  = pd.read_csv('DF1960to1980.csv')
+DF1940to1960  = pd.read_csv('DF1940to1960.csv')
+"""
     
 def clusterDataByLatLong(ufo_sightings):
     #To cluster I will do it by degree of longitude/latitude
@@ -140,6 +161,9 @@ def clusterDataByLatLong(ufo_sightings):
             #literally one number had a 'b' in the longitude, i just ignored it
             #probably thats why I get an error when building the maps.
             #might delete later
+        if(i % int(len(ufo_sightings)/100)):
+            print(i/len(ufo_sightings))
+    return mergedArray
         
     
     """
@@ -179,7 +203,15 @@ def filterResultsByGeographicalBox(bottomLeftLat,bottomLeftLong,topRightLat,topR
     sightingsArray = [sightingsInBox,restOfWorldSightings]
     return sightingsArray
 
-US_Sightings, restOfWorldSightings = filterResultsByGeographicalBox(32,-120,50,-66,ufo_sightings)
+#US_Sightings, restOfWorldSightings = filterResultsByGeographicalBox(32,-120,50,-66,ufo_sightings)
+"""
+load csvs
+US_Sightings  = pd.read_csv('US_Sightings.csv')
+restOfWorldSightings = pd.read_csv('WorldSightingsNoUS.csv')
+
+matplotlib.pyplot.boxplot(restOfWorldSeconds)
+"""
+
 
 def saveArrayToCsv(array, name):
     arrayPandas = pd.DataFrame(array)
@@ -233,6 +265,10 @@ DF1940to1960.to_csv("DF1940to1960.csv")
 DF1960to1980.to_csv("DF1960to1980.csv")
 DF1980to2000.to_csv("DF1980to2000.csv")
 DF2000to2020.to_csv("DF2000to2020.csv")
+
+matplotlib.pyplot.boxplot(array1980to2000)
+matplotlib.pyplot.boxplot(array1960to1980)
+matplotlib.pyplot.boxplot(array1940to1960)
 """
 """
 #IDEA BOX
