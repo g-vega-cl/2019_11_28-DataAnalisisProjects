@@ -76,7 +76,7 @@ def checkLatLongTimeIntegrity(dataset): #Report page 3
     
 
 #Check consistency of country labels and coordinates
-def buildMapFromPandasDatabaseWithText(database): #report page 5
+def buildMapFromPandasDatabaseWithText(database): #report page 4
     fig = plt.figure(figsize=(18, 16), edgecolor='w')
     m = Basemap(projection='moll', resolution=None,
                 lat_0=0, lon_0=0)
@@ -109,7 +109,7 @@ def buildMapFromPandasDatabase(database):
     
 #I will start checking if there is a difference with distribution with time
 #Will hardcode this things to make it faster. Check in the future how to do a df inside another one
-def buildDatabasesByTimeAndPlotMapsPerTimePeriod(ufo_sightings): #report page 6
+def buildDatabasesByTimeAndPlotMapsPerTimePeriod(ufo_sightings): #report page 5
     DF1940to1960 = pd.DataFrame()
     DF1960to1980 = pd.DataFrame()
     DF1980to2000 = pd.DataFrame()
@@ -142,7 +142,7 @@ def buildDatabasesByTimeAndPlotMapsPerTimePeriod(ufo_sightings): #report page 6
             
 #filtering results of a box and outside the box, this is to see if there is a difference between 
     #duration in and outside US, plus its nice to know the percentage of sightings in the US.
-def filterResultsByGeographicalBox(bottomLeftLat,bottomLeftLong,topRightLat,topRightLong,array): #report page 7
+def filterResultsByGeographicalBox(bottomLeftLat,bottomLeftLong,topRightLat,topRightLong,array): #report page 6
     sightingsInBox = pd.DataFrame()
     restOfWorldSightings = pd.DataFrame()
     for i in range(int(len(array))):
@@ -188,7 +188,7 @@ def clusterDataByLatLong(ufo_sightings):
 
 
 #This function has geographical data hardcoded, care when reusing
-def buildingDictionariesAndBuildHistogramOfLocations(mergedArray): #report page 8,9
+def buildingDictionariesAndBuildHistogramOfLocations(mergedArray): #report page 7,8
     mergedStringCounts = Counter(mergedArray) #counting every instance of a sighting in a zone
     filteredMergedCounts = {} #remove values under certain frequency, in this case under 1000
     for value in mergedStringCounts:
