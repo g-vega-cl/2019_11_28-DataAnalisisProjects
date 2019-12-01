@@ -173,3 +173,12 @@ def getPercentageVariance(test_x,test_y, regr):
     acc = acc/len(y_pred)
     print(acc)
     
+"""
+some more citations:
+http://www.cyzsoftware.com/files/diamond_price_predictor.pdf
+https://www.scribd.com/document/272677658/Predicting-Diamond-Price-Using-Linear-Model
+https://csce.ucmss.com/cr/books/2018/LFS/CSREA2018/ICD8070.pdf
+https://www.kaggle.com/shivam2503/diamonds
+https://en.wikipedia.org/wiki/Coefficient_of_determination
+https://www.datasciencecentral.com/profiles/blogs/regression-analysis-how-do-i-interpret-r-squared-and-assess-the 
+"""
