@@ -1,5 +1,7 @@
 # 2019_11_28-Course final proyect
-Two scenarios where data science is used to get an answer
+Two scenarios where data science is used to get an answer.
+Each folder consists of the data used, a report PDF and the code.
+
 <h2>The X-files problem </h2><br>
 <h4>Context:</h4>
 I would like to hire you to tell me where I should go if I want to see an U.F.O. or interview people that claim sightings.” <br>
