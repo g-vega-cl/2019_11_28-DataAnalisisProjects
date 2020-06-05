@@ -1,4 +1,4 @@
-# 2019_11_28-IntelimetricaRecruiting
+# 2019_11_28-Course final proyect
 Two scenarios where data science is used to get an answer
 <h4>The X-files problem </h4><br>
 I would like to hire you to tell me where I should go if I want to see an U.F.O. or interview people that claim sightings.” <br>
