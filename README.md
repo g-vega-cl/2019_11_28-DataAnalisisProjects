@@ -1,4 +1,4 @@
-# 2019_11_28-Course final proyect
+# 2019_11_28-Intellimetrica-Course final proyect
 Two scenarios where data science is used to get an answer.
 Each folder consists of the data used, a report PDF and the code.
 
